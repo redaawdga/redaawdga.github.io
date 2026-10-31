@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8">
+  <title>Game</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
-      overflow: hidden; /* Prevents unwanted scrollbars */
+      overflow: hidden;
     }
-
     iframe {
       width: 100vw;
       height: 100vh;
@@ -23,19 +24,23 @@
   <iframe id="gameFrame"></iframe>
 
   <script>
-    const cdnBase = "https://cdn.jsdelivr.net/gh/redaawdga/redaawdga.github.io@main/";
+    // 1. Point this to the repository containing the actual game files:
+    const cdnBase = "https://cdn.jsdelivr.net/gh/amirbroughanem/GamePortal@main/";
+    const gameHtmlUrl = cdnBase + "main.html"; // or index.html / crazygames.html
 
-    fetch(cdnBase + "index.html")
+    fetch(gameHtmlUrl)
       .then(response => response.text())
-      .then(rawHtml => {
-        // Sets the base URL so all images, audio, and scripts load properly from jsDelivr
-        const executableHtml = rawHtml.replace("<head>", `<head><base href="${cdnBase}">`);
-        const frameDoc = document.getElementById("gameFrame").contentWindow.document;
-        frameDoc.open();
-        frameDoc.write(executableHtml);
-        frameDoc.close();
+      .then(code => {
+        // 2. Ensure all external assets (images, css, audio) load from jsDelivr
+        const executableCode = code.includes("<head>")
+          ? code.replace("<head>", `<head><base href="${cdnBase}">`)
+          : `<base href="${cdnBase}">` + code;
+
+        // 3. Force the browser to render the plain text as executable HTML via a Blob
+        const blob = new Blob([executableCode], { type: "text/html" });
+        document.getElementById("gameFrame").src = URL.createObjectURL(blob);
       })
-      .catch(err => console.error("Failed to load game:", err));
+      .catch(err => console.error("Error loading game from jsDelivr:", err));
   </script>
 
 </body>
