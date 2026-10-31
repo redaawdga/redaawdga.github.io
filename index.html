@@ -20,7 +20,23 @@
 </head>
 <body>
 
-  <iframe src="https://shellgame.me"></iframe>
+  <iframe id="gameFrame"></iframe>
+
+  <script>
+    const cdnBase = "https://cdn.jsdelivr.net/gh/redaawdga/redaawdga.github.io@main/";
+
+    fetch(cdnBase + "index.html")
+      .then(response => response.text())
+      .then(rawHtml => {
+        // Sets the base URL so all images, audio, and scripts load properly from jsDelivr
+        const executableHtml = rawHtml.replace("<head>", `<head><base href="${cdnBase}">`);
+        const frameDoc = document.getElementById("gameFrame").contentWindow.document;
+        frameDoc.open();
+        frameDoc.write(executableHtml);
+        frameDoc.close();
+      })
+      .catch(err => console.error("Failed to load game:", err));
+  </script>
 
 </body>
 </html>
